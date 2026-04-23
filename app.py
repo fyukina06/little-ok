@@ -46,7 +46,7 @@ if "done_message" not in st.session_state:
     st.session_state.done_message = ""
 
 with tab1:
-    st.markdown("""<h3 style='text-align: center; font-size:18px;'>
+    st.markdown("""<h3 style='text-align: center; font-size:20px;'>
         今日のリトルOKを1つ決めよう
         </h3> 
         """, unsafe_allow_html=True)
