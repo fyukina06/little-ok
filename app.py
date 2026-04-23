@@ -62,6 +62,67 @@ div.stButton > button {
     display: block;
     margin-top: 4px;
 }
+
+/* カレンダー */
+.calendar-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 6px;
+    table-layout: fixed;
+    margin-top: 10px;
+}
+
+.calendar-table th {
+    text-align: center;
+    font-size: 14px;
+    color: #333;
+    padding: 6px 0;
+}
+
+.calendar-table td {
+    background: rgba(255,255,255,0.45);
+    border-radius: 14px;
+    height: 64px;
+    text-align: center;
+    vertical-align: top;
+    font-size: 15px;
+    padding-top: 8px;
+    word-break: keep-all;
+}
+
+.calendar-day {
+    display: block;
+    font-weight: 600;
+}
+
+.calendar-stamp {
+    display: block;
+    margin-top: 4px;
+    font-size: 18px;
+}
+
+@media (max-width: 640px) {
+    .calendar-table {
+        border-spacing: 4px;
+    }
+
+    .calendar-table th {
+        font-size: 12px;
+    }
+
+    .calendar-table td {
+        height: 52px;
+        font-size: 13px;
+        padding-top: 6px;
+        border-radius: 10px;
+    }
+
+    .calendar-stamp {
+        font-size: 15px;
+        margin-top: 2px;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -155,10 +216,10 @@ with tab2:
 with tab3:
     st.markdown("<h3 style='text-align: center;'>できた記録 🌷</h3>", unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 3, 1])
+    col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
-        st.button("←", on_click=prev_month, use_container_width=True)
+        st.button("←", key="prev_month_btn", on_click=prev_month, use_container_width=True)
 
     with col2:
         st.markdown(
@@ -167,79 +228,27 @@ with tab3:
         )
 
     with col3:
-        st.button("→", on_click=next_month, use_container_width=True)
+        st.button("→", key="next_month_btn", on_click=next_month, use_container_width=True)
 
-    # 月カレンダー
-    cal = calendar.monthcalendar(st.session_state.display_year, st.session_state.display_month)
+    cal = calendar.monthcalendar(
+        st.session_state.display_year,
+        st.session_state.display_month
+    )
     day_names = ["月", "火", "水", "木", "金", "土", "日"]
 
-    calendar_html = """
-    <style>
-    .calendar-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 6px;
-        table-layout: fixed;
-        margin-top: 10px;
-    }
-    .calendar-table th {
-        text-align: center;
-        font-size: 14px;
-        color: #333;
-        padding: 6px 0;
-    }
-    .calendar-table td {
-        background: rgba(255,255,255,0.45);
-        border-radius: 14px;
-        height: 64px;
-        text-align: center;
-        vertical-align: top;
-        font-size: 15px;
-        padding-top: 8px;
-        word-break: keep-all;
-    }
-    .calendar-day {
-        display: block;
-        font-weight: 600;
-    }
-    .calendar-stamp {
-        display: block;
-        margin-top: 4px;
-        font-size: 18px;
-    }
+    table_html = "<table class='calendar-table'>"
+    table_html += "<thead><tr>"
 
-    @media (max-width: 640px) {
-        .calendar-table {
-            border-spacing: 4px;
-        }
-        .calendar-table th {
-            font-size: 12px;
-        }
-        .calendar-table td {
-            height: 52px;
-            font-size: 13px;
-            padding-top: 6px;
-            border-radius: 10px;
-        }
-        .calendar-stamp {
-            font-size: 15px;
-            margin-top: 2px;
-        }
-    }
-    </style>
-    """
-
-    calendar_html += "<table class='calendar-table'>"
-    calendar_html += "<thead><tr>"
     for day_name in day_names:
-        calendar_html += f"<th>{day_name}</th>"
-    calendar_html += "</tr></thead><tbody>"
+        table_html += f"<th>{day_name}</th>"
+
+    table_html += "</tr></thead><tbody>"
 
     for week in cal:
-        calendar_html += "<tr>"
+        table_html += "<tr>"
         for day in week:
             if day == 0:
-                calendar_html += "<td></td>"
+                table_html += "<td></td>"
             else:
                 date_str = datetime.date(
                     st.session_state.display_year,
@@ -247,24 +256,21 @@ with tab3:
                     day
                 ).isoformat()
 
+                stamp_html = ""
                 if date_str in st.session_state.done_days:
-                    calendar_html += f"""
-                    <td>
-                        <span class="calendar-day">{day}</span>
-                        <span class="calendar-stamp">🌷</span>
-                    </td>
-                    """
-                else:
-                    calendar_html += f"""
-                    <td>
-                        <span class="calendar-day">{day}</span>
-                    </td>
-                    """
-        calendar_html += "</tr>"
+                    stamp_html = "<span class='calendar-stamp'>🌷</span>"
 
-    calendar_html += "</tbody></table>"
+                table_html += f"""
+                <td>
+                    <span class='calendar-day'>{day}</span>
+                    {stamp_html}
+                </td>
+                """
+        table_html += "</tr>"
 
-    st.markdown(calendar_html, unsafe_allow_html=True)
+    table_html += "</tbody></table>"
+
+    st.markdown(table_html, unsafe_allow_html=True)
 
 
 with tab4:
